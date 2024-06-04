@@ -17,6 +17,10 @@ const switchMode = require("./src/routes/Dashboard/switch");
 const findMode = require("./src/routes/Dashboard/findMode");
 const selectLocation = require("./src/routes/findRide/selectLocation");
 const findMatch = require("./src/routes/findRide/findMatches");
+const completeDriverDetails = require("./src/routes/driver/register");
+const approve = require("./src/routes/driver/approve");
+const getDriverLocation = require("./src/routes/driver/driverLocation");
+const createRide = require("./src/routes/driver/createRide");
 
 // middleware
 app.use(express.urlencoded({ extended: false }));
@@ -24,10 +28,6 @@ app.use(express.json());
 app.use(cors());
 app.disable("x-powered-by");
 app.use(cookieParser());
-
-app.get("/", (req, res) => {
-  res.send("<h1>CUber is ready to take off</h1>");
-});
 
 // auth
 app.use("/auth/signup", signUp);
@@ -44,6 +44,14 @@ app.use("/protected", protect);
 app.use("/user/findMode", findMode);
 app.use("/user/selectLocation", selectLocation);
 app.use("/user/findMatch", findMatch);
+app.use("/user/completeDriverDetails", completeDriverDetails);
+app.use("/user/approve", approve);
+app.use("/user/createRide", createRide);
+app.use("/user/getDriverLocation", getDriverLocation);
+
+app.get("*", (req, res) => {
+  res.status(404).send("<h1>Page not found </h1>");
+});
 
 const start = async () => {
   await connect(URL);

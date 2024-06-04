@@ -21,17 +21,17 @@ function knn(drivers, passengers) {
 
   // k-NN Algorithm
   function findNearestDrivers(passenger, drivers) {
-    const { latitude: lat, longitude: lng } = passenger; //, pickUpTime, gender (extra preferences that can be added in the future)
+    const { lat: pLat, lng: pLong } = passenger.location; //, pickUpTime, gender (extra preferences that can be added in the future)
     let matchedDrivers = [];
 
     // Filter drivers based on user preference e.g pickup time and gender. But this will be implemented later
-    const eligibleDrivers = drivers.filter(
-      (driver) => driver.pickUpTime === pickUpTime && driver.gender === gender
-    );
+    // const eligibleDrivers = drivers.filter(
+    //   (driver) => driver.pickUpTime === pickUpTime && driver.gender === gender
+    // );
 
     // Calculate distance for each eligible driver using Euclidean distance
     drivers.forEach((driver) => {
-      const { latitude: dLat, longitude: dLong } = driver;
+      const { lat: dLat, lng: dLong } = driver.location;
       const distance = calculateDistance(pLat, pLong, dLat, dLong);
       matchedDrivers.push({ driver, distance });
     });
@@ -46,21 +46,27 @@ function knn(drivers, passengers) {
   // Function to match a specified number of passengers
   function matchPassengers(passenger, drivers) {
     const nearestDrivers = findNearestDrivers(passenger, drivers);
+    let matchedDrivers = [];
     nearestDrivers.forEach((driver, idx) => {
-      return (matchedDrivers = `Matched Driver ${idx + 1}: ${
-        driver.name
-      },Distance: ${calculateDistance(
-        passenger.lat,
-        passenger.lng,
-        driver.lat,
-        driver.lng
-      )} km `);
+      matchedDrivers.push(
+        `Matched Driver ${idx + 1}: ${
+          driver.email
+        },Distance: ${calculateDistance(
+          passenger.location.lat,
+          passenger.location.lng,
+          driver.location.lat,
+          driver.location.lng
+        )} km `
+      );
+
+      // console.log(matchedDrivers);
     });
+    return matchedDrivers;
   }
 
   // Example usage: match first 5 passengers
   const numberOfPassengersToMatch = 1; // You can change this value
-  matchPassengers(passengers, drivers);
+  return matchPassengers(passengers, drivers);
 }
 
 module.exports = knn;

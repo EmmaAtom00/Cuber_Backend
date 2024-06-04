@@ -1,7 +1,7 @@
 const { Router } = require("express");
-const findM = require("./controller/findMatches");
+const register = require("./controller/register");
 const router = Router();
 
-router.route("/").get(findM);
+router.route("/").post(register);
 
 module.exports = router;

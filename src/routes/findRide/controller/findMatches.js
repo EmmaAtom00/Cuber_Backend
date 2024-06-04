@@ -8,6 +8,7 @@ const findM = async (req, res) => {
   const Passenger = await passenger.findOne({ email: req.user.email });
   if (!Passenger) return res.status(404).json({ msg: "user not found" });
   const matches = knn(drivers, Passenger);
+  console.log(matches);
   return res.status(200).json({ data: matches });
 };
 

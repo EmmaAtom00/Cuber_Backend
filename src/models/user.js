@@ -36,6 +36,10 @@ const userSchema = new schema(
       type: String,
     },
     driver: { type: Boolean, default: false },
+    nin: Number,
+    car_type: String,
+    reg_no: String,
+    approved: { type: Boolean, default: false },
     OTPs: {
       verifyOTP: {
         OTP: { type: String },

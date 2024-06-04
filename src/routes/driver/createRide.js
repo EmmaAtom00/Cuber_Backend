@@ -1,7 +1,7 @@
 const { Router } = require("express");
-const findM = require("./controller/findMatches");
+const createRide = require("./controller/createRide");
 const router = Router();
 
-router.route("/").get(findM);
+router.route("/").post(createRide);
 
 module.exports = router;
