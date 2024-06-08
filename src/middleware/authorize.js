@@ -1,31 +1,40 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const argon = require("argon2");
-const user = require("../models/user");
+const argon = require("argon2"); // argon is not used in this middleware, consider removing it if unnecessary
+const User = require("../models/user");
 
 const authorize = async (req, res, next) => {
   const accessToken = req.headers["authorization"];
 
-  if (!accessToken)
-    return res.status(401).json({ msg: "No access token", token: accessToken });
+  if (!accessToken) {
+    return res.status(401).json({ msg: "No access token provided" });
+  }
 
-  const verify = jwt.verify(
-    accessToken,
-    process.env.accessTokenKey,
-    async (err, decode) => {
-      if (err) return res.status(401).json({ msg: "Expired token" });
-      else {
-        req.user = decode;
-        const find = await user.findOne({
-          email: { $regex: new RegExp(`^${req.user.email}$`, "i") },
-        });
-        if (!find) {
-          return res.status(401).json({ msg: "User not found" });
-        }
-        next();
+  try {
+    const decoded = jwt.verify(
+      accessToken,
+      process.env.ACCESS_TOKEN_KEY,
+      (err, decode) => {
+        if (decode) req.user = decode;
       }
+    );
+
+    const user = await User.findOne({
+      email: { $regex: new RegExp(`^${req.user.email}$`, "i") },
+    });
+
+    if (!user) {
+      return res.status(401).json({ msg: "Invalid details" });
     }
-  );
+
+    next();
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ msg: "Session Timeout" });
+    }
+    console.log(err);
+    return res.status(401).json({ msg: "Please login" });
+  }
 };
 
 module.exports = authorize;

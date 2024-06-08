@@ -1,7 +1,7 @@
 const { Router } = require("express");
-const protect = require("./controller/protect");
+const routesProtected = require("./controller/routesProtected");
 const router = Router();
 
-router.route("/").get(protect);
+router.route("/").get(routesProtected);
 
 module.exports = router;

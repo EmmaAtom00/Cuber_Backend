@@ -1,12 +1,9 @@
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const connect = require("./src/models/connect");
 require("dotenv").config();
-const PORT = process.env.PORT;
-const URL = process.env.MONGODB_URL;
 
+const connect = require("./src/models/connect");
 const signUp = require("./src/routes/auth/signup");
 const login = require("./src/routes/auth/login");
 const logout = require("./src/routes/logout/logout");
@@ -22,25 +19,29 @@ const approve = require("./src/routes/driver/approve");
 const getDriverLocation = require("./src/routes/driver/driverLocation");
 const createRide = require("./src/routes/driver/createRide");
 
-// middleware
+const app = express();
+const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
+const URL = process.env.MONGODB_URL;
+
+// Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
-app.disable("x-powered-by");
 app.use(cookieParser());
+app.disable("x-powered-by");
 
-// auth
+// Auth routes
 app.use("/auth/signup", signUp);
 app.use("/auth/login", login);
 
-// authorization middleware
+// Authorization middleware
 app.use(authorize);
 
-// routes that needs authorization
+// Protected routes
 app.use("/user/switch", switchMode);
 app.use("/user/dashboard", dashboard);
 app.use("/logout", logout);
-app.use("/protected", protect);
+app.use("/protects", protect);
 app.use("/user/findMode", findMode);
 app.use("/user/selectLocation", selectLocation);
 app.use("/user/findMatch", findMatch);
@@ -49,13 +50,27 @@ app.use("/user/approve", approve);
 app.use("/user/createRide", createRide);
 app.use("/user/getDriverLocation", getDriverLocation);
 
-app.get("*", (req, res) => {
-  res.status(404).send("<h1>Page not found </h1>");
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ msg: "Page not found" });
+});
+// send("<h1>Page not found</h1>")
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal Server Error" });
 });
 
-const start = async () => {
-  await connect(URL);
-  app.listen(PORT, () => console.log(`server listening to port ${PORT}`));
+// Start server
+const startServer = async () => {
+  try {
+    await connect(URL);
+    app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 };
 
-start();
+startServer();
