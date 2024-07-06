@@ -1,4 +1,4 @@
-function knn(drivers, passengers) {
+function knn(drivers, passengers, preferences = {}) {
   // Function to calculate Euclidean distance in kilometers
   function calculateDistance(lat1, lon1, lat2, lon2) {
     const earthRadius = 6371; // Radius of the Earth in kilometers
@@ -23,46 +23,40 @@ function knn(drivers, passengers) {
   function findNearestDrivers(passenger, drivers, k = 3) {
     const { lat: pLat, lng: pLng } = passenger.location;
 
-    // User preference
-    // Filter drivers based on user preference e.g pickup time and gender. But this will be implemented later
-    // const eligibleDrivers = drivers.filter(
-    //   (driver) => driver.pickUpTime === pickUpTime && driver.gender === gender
-    // );
+    // Filter drivers based on user preferences
+    let eligibleDrivers = drivers;
+    if (preferences.pickUpTime) {
+      eligibleDrivers = eligibleDrivers.filter(
+        (driver) => driver.pickUpTime === preferences.pickUpTime
+      );
+    }
+    if (preferences.gender) {
+      eligibleDrivers = eligibleDrivers.filter(
+        (driver) => driver.gender === preferences.gender
+      );
+    }
 
-    const matchedDrivers = drivers.map((driver) => {
+    const matchedDrivers = eligibleDrivers.map((driver) => {
       const { lat: dLat, lng: dLng } = driver.location;
       const distance = calculateDistance(pLat, pLng, dLat, dLng);
+      let Driver = { ...driver, distance };
       return { driver, distance };
     });
 
     // Sort drivers by distance and return the top k drivers
-    return matchedDrivers
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, k)
-      .map((match) => match.driver);
+    return matchedDrivers.sort((a, b) => a.distance - b.distance).slice(0, k);
+    // .map((match) => {
+    //   return match.driver;
+    // });
   }
 
   // Match passengers to drivers and return formatted results
   function matchPassengers(passenger, drivers) {
-    const nearestDrivers = findNearestDrivers(passenger, drivers);
-    return nearestDrivers.map(
-      (driver, idx) =>
-        `Matched Driver ${idx + 1}: ${
-          driver.email
-        }, Distance: ${calculateDistance(
-          passenger.location.lat,
-          passenger.location.lng,
-          driver.location.lat,
-          driver.location.lng
-        )} km`
-    );
+    return findNearestDrivers(passenger, drivers);
   }
 
-  // Example usage: match the first passenger
-  const numberOfPassengersToMatch = 1; // You can change this value if needed
-  return passengers
-    .slice(0, numberOfPassengersToMatch)
-    .map((passenger) => matchPassengers(passenger, drivers));
+  // Example usage: match all passengers
+  return passengers.map((passenger) => matchPassengers(passenger, drivers));
 }
 
 module.exports = knn;

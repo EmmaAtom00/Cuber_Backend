@@ -24,12 +24,12 @@ const signUpController = async (req, res) => {
   //   create access token and refresh token
   const accessToken = jwt.sign(
     { email: email, firstName: firstName, lastName: lastName },
-    process.env.accessTokenKey,
+    process.env.ACCESS_TOKEN_KEY,
     { expiresIn: "5m" }
   );
   const refreshToken = jwt.sign(
     { email: email, firstName: firstName, lastName: lastName },
-    process.env.accessTokenKey,
+    process.env.REFRESH_TOKEN_KEY,
     { expiresIn: "1d" }
   );
 

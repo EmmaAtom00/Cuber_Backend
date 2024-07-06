@@ -3,9 +3,9 @@ const user = require("../../../models/user");
 
 const selectLocation = async (req, res) => {
   try {
-    const dbUser = user.findOne({ email: req.user.email });
+    const dbUser = await user.findOne({ email: req.user.email });
 
-    if (!user) return res.status(404).json({ msg: "User not found" });
+    if (!dbUser) return res.status(404).json({ msg: "User not found" });
 
     const existingRide = await passenger.findOne({ email: req.user.email });
 
@@ -14,26 +14,33 @@ const selectLocation = async (req, res) => {
         .status(403)
         .json({ msg: "You have an existing ride, finish it or cancel it" });
 
-    const { location, destination } = req.body;
+    // console.log(req.body);
+    const { currentLocation, destination, pickup } = req.body.dataToSend;
+    const location = currentLocation;
 
-    if (!(location && destination))
+    if (!(location && destination && pickup))
       return res
         .status(400)
         .json({ msg: "please enter your location and destination" });
 
+    if (!(location.longitude && location.latitude))
+      return res
+        .status(400)
+        .json({ msg: "can't get your location, try again..." });
+
     const ride = {
       email: req.user.email,
       location: {
-        lng: Number(location.lng),
-        lat: Number(location.lat),
+        lng: Number(location.longitude),
+        lat: Number(location.latitude),
       },
-      destination: {
-        lng: Number(destination.lng),
-        lat: Number(destination.lat),
-      },
+      destination,
+      pickup,
+      firstName: dbUser.firstName,
+      lastName: dbUser.lastName,
     };
 
-    console.log(ride);
+    // console.log(ride);
 
     const save = await passenger.create(ride);
 

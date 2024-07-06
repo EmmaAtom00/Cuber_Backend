@@ -18,6 +18,15 @@ const completeDriverDetails = require("./src/routes/driver/register");
 const approve = require("./src/routes/driver/approve");
 const getDriverLocation = require("./src/routes/driver/driverLocation");
 const createRide = require("./src/routes/driver/createRide");
+const refreshToken = require("./src/routes/auth/refreshToken");
+const activeRide = require("./src/routes/Dashboard/activeRide");
+const deletePassengerRide = require("./src/routes/util/deletePassengerRide");
+const getDriverDetails = require("./src/routes/driver/driverDetails");
+const sendRequest = require("./src/routes/findRide/sendRequest");
+const getInbox = require("./src/routes/Dashboard/inbox");
+const deleteRequest = require("./src/routes/Dashboard/deleteRequest");
+const acceptRequest = require("./src/routes/Dashboard/acceptRequest");
+const notification = require("./src/routes/Dashboard/notification");
 
 const app = express();
 const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
@@ -49,6 +58,15 @@ app.use("/user/completeDriverDetails", completeDriverDetails);
 app.use("/user/approve", approve);
 app.use("/user/createRide", createRide);
 app.use("/user/getDriverLocation", getDriverLocation);
+app.use("/auth/refreshToken", refreshToken);
+app.use("/user/activeRide", activeRide);
+app.use("/deletePassengerRide", deletePassengerRide);
+app.use("/user/getDriverDetails", getDriverDetails);
+app.use("/user/sendRequest", sendRequest);
+app.use("/user/Inbox", getInbox);
+app.use("/user/deleteRequest", deleteRequest);
+app.use("/user/acceptRequest", acceptRequest);
+app.use("/user/notification", notification);
 
 // 404 handler
 app.use((req, res) => {

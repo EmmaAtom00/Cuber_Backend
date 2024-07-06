@@ -3,14 +3,16 @@ const mongoose = require("mongoose");
 const passengerRide = new mongoose.Schema(
   {
     email: { type: String, required: true },
+    firstName: String,
+    lastName: String,
     location: {
       lat: Number,
       lng: Number,
     },
     destination: {
-      lat: Number,
-      lng: Number,
+      type: String,
     },
+    pickup: { type: String },
     schedule: {
       startTime: String,
       endTime: String,
@@ -26,13 +28,20 @@ const passenger = mongoose.model("passengerRide", passengerRide);
 const DriverRide = new mongoose.Schema(
   {
     email: String,
+    firstName: String,
+    lastName: String,
+    size: Number,
+    price: Number,
+    passengers: Array,
     location: {
       lat: Number,
       lng: Number,
     },
     destination: {
-      lat: Number,
-      lng: Number,
+      type: String,
+    },
+    pickup: {
+      type: String,
     },
     schedule: {
       startTime: String,

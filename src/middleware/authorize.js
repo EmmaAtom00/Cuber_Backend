@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const argon = require("argon2"); // argon is not used in this middleware, consider removing it if unnecessary
 const User = require("../models/user");
 
 const authorize = async (req, res, next) => {
@@ -20,6 +19,7 @@ const authorize = async (req, res, next) => {
     );
 
     const user = await User.findOne({
+      //the regex allows for authentication with characters either uppercase or lowercase
       email: { $regex: new RegExp(`^${req.user.email}$`, "i") },
     });
 
@@ -32,7 +32,6 @@ const authorize = async (req, res, next) => {
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({ msg: "Session Timeout" });
     }
-    console.log(err);
     return res.status(401).json({ msg: "Please login" });
   }
 };
