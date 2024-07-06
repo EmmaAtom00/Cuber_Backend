@@ -27,6 +27,8 @@ const getInbox = require("./src/routes/Dashboard/inbox");
 const deleteRequest = require("./src/routes/Dashboard/deleteRequest");
 const acceptRequest = require("./src/routes/Dashboard/acceptRequest");
 const notification = require("./src/routes/Dashboard/notification");
+const deleteNotification = require("./src/routes/util/deleteNotification");
+const readNotification = require("./src/routes/util/readNotification");
 
 const app = express();
 const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
@@ -67,6 +69,8 @@ app.use("/user/Inbox", getInbox);
 app.use("/user/deleteRequest", deleteRequest);
 app.use("/user/acceptRequest", acceptRequest);
 app.use("/user/notification", notification);
+app.use("/user/deleteNotification", deleteNotification);
+app.use("/user/readNotification", readNotification);
 
 // 404 handler
 app.use((req, res) => {
