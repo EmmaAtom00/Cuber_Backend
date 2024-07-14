@@ -1,6 +1,7 @@
-const { driver } = require("../../../models/ride");
+const { driver, passenger } = require("../../../models/ride");
 const inbox = require("../../../models/inbox");
 const user = require("../../../models/user");
+const notification = require("../../../models/notification ");
 
 const acceptRequest = async (req, res) => {
   try {
@@ -31,6 +32,22 @@ const acceptRequest = async (req, res) => {
       passengers,
       { runValidators: true, new: false }
     );
+
+    const addDriverToPassenger = await passenger.findOneAndUpdate(
+      { email: email },
+      { driver: driverEmail },
+      { new: false, runValidators: true }
+    );
+
+    if (!addDriverToPassenger)
+      return res.status(403).json({ msg: "could not add driver to passenger" });
+
+    const details = await passenger.findOne({ email: email });
+
+    await notification.create({
+      email: details.email,
+      message: `${details.firstName}, your request for the trip ${details.pickup} - ${details.destination} has been accepted, check your ride for more details.`,
+    });
 
     if (addPassenger) {
       await inbox.findByIdAndDelete(id);
