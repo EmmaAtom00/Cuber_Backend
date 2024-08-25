@@ -2,6 +2,7 @@ const { driver, passenger } = require("../../../models/ride");
 const inbox = require("../../../models/inbox");
 const user = require("../../../models/user");
 const notification = require("../../../models/notification ");
+const { passengerHistory } = require("../../../models/history");
 
 const acceptRequest = async (req, res) => {
   try {
@@ -24,6 +25,19 @@ const acceptRequest = async (req, res) => {
     if (!findRide) {
       return res.status(404).json({ msg: "Driver doesn't have a ride" });
     }
+
+    const successRide = await passengerHistory.findOne({ email: email });
+    const existedPassenger = findRide.passengers.indexOf(email);
+    console.log(existedPassenger);
+    if (email == findRide.passengers[existedPassenger])
+      return res.status(400).json({
+        msg: "You have already accepted a request from this passenger",
+      });
+    // console.log(successRide);
+
+    // if (!successRide) {
+
+    // }
 
     const passengers = { passengers: [...findRide.passengers, email] };
 

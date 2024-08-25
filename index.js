@@ -30,6 +30,12 @@ const notification = require("./src/routes/Dashboard/notification");
 const deleteNotification = require("./src/routes/util/deleteNotification");
 const readNotification = require("./src/routes/util/readNotification");
 const acceptedRide = require("./src/routes/Dashboard/acceptedRide");
+const rideDetails = require("./src/routes/driver/rideDetails");
+const dropPassenger = require("./src/routes/driver/dropPassenger");
+const checkSuccess = require("./src/routes/driver/checkSucess");
+const requestStatus = require("./src/routes/driver/requestStatus");
+const completeRide = require("./src/routes/Dashboard/completeRide");
+const endRide = require("./src/routes/driver/endRide");
 
 const app = express();
 const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
@@ -73,6 +79,12 @@ app.use("/user/notification", notification);
 app.use("/user/deleteNotification", deleteNotification);
 app.use("/user/readNotification", readNotification);
 app.use("/user/acceptedRide", acceptedRide);
+app.use("/rideDetails", rideDetails);
+app.use("/dropPassenger", dropPassenger);
+app.use("/checkSuccess", checkSuccess);
+app.use("/requestStatus", requestStatus);
+app.use("/completeRide", completeRide);
+app.use("/endRide", endRide);
 
 // 404 handler
 app.use((req, res) => {

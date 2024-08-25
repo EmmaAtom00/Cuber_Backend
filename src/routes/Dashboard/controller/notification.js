@@ -14,12 +14,12 @@ const getNotification = async (req, res) => {
     const findNotifications = await notification.find({ email });
 
     if (!findNotifications || findNotifications.length === 0) {
-      return res.status(404).json({ msg: "Notifications not found" });
+      return res.status(204).json({ msg: "Notifications not found" });
     }
 
     return res.status(200).json({ notifications: findNotifications });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({ msg: "Server error" });
   }
 };

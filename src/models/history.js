@@ -2,14 +2,14 @@ const mongoose = require("mongoose");
 
 const driverHis = new mongoose.Schema(
   {
-    email: { String },
+    email: String,
     location: {
       lat: { type: Number },
-      lng: { Number },
+      lng: Number,
     },
     destination: {
-      lat: { Number },
-      lng: { Number },
+      lat: Number,
+      lng: Number,
     },
     schedule: {
       startTime: String,
@@ -26,19 +26,23 @@ const driverHis = new mongoose.Schema(
 const driverHistory = mongoose.model("driverHistory", driverHis);
 
 const passengerHis = new mongoose.Schema({
-  email: { String },
+  email: String,
   location: {
-    lat: { type: Number },
-    lng: { Number },
+    lat: Number,
+    lng: Number,
   },
   destination: {
-    lat: { Number },
-    lng: { Number },
+    lat: Number,
+    lng: Number,
   },
   schedule: {
     startTime: String,
     endTime: String,
   },
+  destination: {
+    type: String,
+  },
+  pickup: { type: String },
   driver: String,
   success: Boolean,
 });

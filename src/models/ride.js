@@ -18,6 +18,7 @@ const passengerRide = new mongoose.Schema(
       endTime: String,
     },
     driver: String,
+    requestToDrop: { type: Boolean, default: false },
     success: { type: Boolean, default: false },
   },
   { timestamps: true }
