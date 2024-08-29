@@ -9,56 +9,68 @@ const endRide = async (req, res) => {
 
     const ride = await driver.findOne({ email: driverId });
 
-    const findRideAndEnd = await driver.findOneAndUpdate(
+    if (!ride) {
+      return res
+        .status(404)
+        .json({ message: "Ride not found for this driver" });
+    }
+
+    // Update the driver ride to be successful
+    const updateRide = await driver.findOneAndUpdate(
       { email: driverId },
       { success: true },
       { new: false, runValidators: true }
     );
-    if (findRideAndEnd) {
-      const notify = await notification.create({
-        email: driverId,
-        message: "You just ended your ride, check history for details",
-      });
-      for (let i in ride.passengers) {
-        console.log(i);
-        const notifyPassenger = await notification.create({
-          email: i,
-          message: `Driver ${driverId} has ended his trip`,
-        });
-      }
-      const rideHistory = {
-        email: driverId,
-        location: {
-          lat: ride.location.lat,
-          lng: ride.location.lng,
-        },
 
+    if (updateRide) {
+      // Notify the driver about the end of the ride
+      await notification.create({
+        email: driverId,
+        message: "You just ended your ride. Check history for details.",
+      });
+
+      // Notify all passengers that the driver has ended the ride
+      const passengerNotifications = ride.passengers.map((passenger) => ({
+        email: passenger.email,
+        message: `Driver ${driverId} has ended the trip.`,
+      }));
+      await notification.insertMany(passengerNotifications);
+
+      // Add the ride to history before deleting it
+      const rideHistory = {
+        _id: ride._id,
+        email: driverId,
+        location: ride.location,
         passengers: ride.passengers,
         success: true,
       };
-      const hist = await driverHistory.create(rideHistory);
-      if (hist) {
-        const deleteRide = await driver.findOneAndDelete({ email: driverId });
-        const requests = await inbox.find({ driverEmail: driverId });
-        if (requests) {
-          for (let i in requests) {
-            console.log(i);
-            const notifyPass = await notification.create({
-              email: i.email,
-              message:
-                "Your request has been deleted because the driver ended the ride",
-            });
-          }
+
+      const historyCreated = await driverHistory.create(rideHistory);
+      if (historyCreated) {
+        // Delete the ride from available drivers
+        await driver.findOneAndDelete({ email: driverId });
+
+        // Notify passengers with pending requests
+        const pendingRequests = await inbox.find({ driverEmail: driverId });
+        if (pendingRequests.length > 0) {
+          const requestNotifications = pendingRequests.map((request) => ({
+            email: request.email,
+            message:
+              "Your request has been deleted because the driver ended the ride.",
+          }));
+          await notification.insertMany(requestNotifications);
         }
-        const deleteRequest = await inbox.findOneAndDelete({
-          driverEmail: driverId,
-        });
+
+        // Delete the requests from inbox
+        await inbox.deleteMany({ driverEmail: driverId });
       }
     }
-    return res.status(200).json({ msg: "Ride has ended successfully" });
+
+    return res.status(200).json({ message: "Ride has ended successfully" });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ msg: "Server error" });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
 

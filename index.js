@@ -35,7 +35,10 @@ const dropPassenger = require("./src/routes/driver/dropPassenger");
 const checkSuccess = require("./src/routes/driver/checkSucess");
 const requestStatus = require("./src/routes/driver/requestStatus");
 const completeRide = require("./src/routes/Dashboard/completeRide");
+const allUserDropped = require("./src/routes/driver/allUserDropped");
+const startedRide = require("./src/routes/driver/started");
 const endRide = require("./src/routes/driver/endRide");
+const startRide = require("./src/routes/driver/startRide");
 
 const app = express();
 const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
@@ -84,7 +87,10 @@ app.use("/dropPassenger", dropPassenger);
 app.use("/checkSuccess", checkSuccess);
 app.use("/requestStatus", requestStatus);
 app.use("/completeRide", completeRide);
+app.use("/allUserDropped", allUserDropped);
+app.use("/started", startedRide);
 app.use("/endRide", endRide);
+app.use("/startRide", startRide);
 
 // 404 handler
 app.use((req, res) => {

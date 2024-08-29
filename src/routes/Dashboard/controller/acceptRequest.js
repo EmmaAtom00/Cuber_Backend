@@ -8,73 +8,83 @@ const acceptRequest = async (req, res) => {
   try {
     const driverEmail = req.user.email;
 
+    const driverRide = await driver.findOne({ email: driverEmail });
+    if (!driverRide) {
+      return res.status(404).json({ message: "No active ride" });
+    }
+
     const { id, email } = req.params;
 
     if (!id) {
-      return res.status(400).json({ msg: "No request with this id found" });
+      return res.status(400).json({ message: "No request with this ID found" });
     }
 
-    const findUser = await user.findOne({ email: email });
-
+    const findUser = await user.findOne({ email });
     if (!findUser) {
-      return res.status(404).json({ msg: "Passenger does not exist" });
+      return res.status(404).json({ message: "Passenger does not exist" });
     }
 
-    const findRide = await driver.findOne({ email: driverEmail });
-
-    if (!findRide) {
-      return res.status(404).json({ msg: "Driver doesn't have a ride" });
+    if (driverRide.space === 0) {
+      return res.status(400).json({ message: "Not enough space" });
     }
 
-    const successRide = await passengerHistory.findOne({ email: email });
-    const existedPassenger = findRide.passengers.indexOf(email);
-    console.log(existedPassenger);
-    if (email == findRide.passengers[existedPassenger])
+    const passengerRide = await passenger.findOne({ email });
+    if (!passengerRide) {
+      await inbox.findByIdAndDelete(id);
+      return res.status(404).json({ message: "This ride does not exist" });
+    }
+
+    const passengerAlreadyAccepted = driverRide.passengers.some(
+      (p) => p.email === email
+    );
+    if (passengerAlreadyAccepted) {
+      await inbox.findByIdAndDelete(id);
       return res.status(400).json({
-        msg: "You have already accepted a request from this passenger",
+        message: "You have already accepted a request from this passenger",
       });
-    // console.log(successRide);
+    }
 
-    // if (!successRide) {
+    const toAddPassenger = { email, _id: passengerRide._id };
 
-    // }
-
-    const passengers = { passengers: [...findRide.passengers, email] };
-
-    const addPassenger = await driver.findOneAndUpdate(
+    const updatedDriverRide = await driver.findOneAndUpdate(
       { email: driverEmail },
-      passengers,
-      { runValidators: true, new: false }
+      {
+        $push: { passengers: toAddPassenger },
+        $inc: { space: -1 },
+      },
+      { runValidators: true, new: true }
     );
 
     const addDriverToPassenger = await passenger.findOneAndUpdate(
-      { email: email },
+      { email },
       { driver: driverEmail },
-      { new: false, runValidators: true }
+      { new: true, runValidators: true }
     );
 
-    if (!addDriverToPassenger)
-      return res.status(403).json({ msg: "could not add driver to passenger" });
-
-    const details = await passenger.findOne({ email: email });
+    if (!addDriverToPassenger) {
+      return res
+        .status(403)
+        .json({ message: "Could not add driver to passenger" });
+    }
 
     await notification.create({
-      email: details.email,
-      message: `${details.firstName}, your request for the trip ${details.pickup} - ${details.destination} has been accepted, check your ride for more details.`,
+      email: findUser.email,
+      message: `${findUser.firstName}, your request for the trip ${passengerRide.pickup} - ${passengerRide.destination} has been accepted. Check your ride for more details.`,
     });
 
-    if (addPassenger) {
+    if (updatedDriverRide) {
       await inbox.findByIdAndDelete(id);
-
-      return res.status(200).json({ msg: "Success" });
+      return res.status(200).json({ message: "Success" });
     } else {
       return res
         .status(500)
-        .json({ msg: "Failed to accept passenger request" });
+        .json({ message: "Failed to accept passenger request" });
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ msg: "Something went wrong" });
+    return res
+      .status(500)
+      .json({ message: "Something went wrong", error: error.message });
   }
 };
 

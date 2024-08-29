@@ -24,6 +24,7 @@ const createRide = async (req, res) => {
       size: Number(tripDetails.passenger_size),
       firstName: dbUser.firstName,
       lastName: dbUser.lastName,
+      space: Number(tripDetails.passenger_size),
     };
 
     const update = await driver.findOneAndUpdate(

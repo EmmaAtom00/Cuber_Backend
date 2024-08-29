@@ -20,7 +20,7 @@ const getDriverDetails = async (req, res) => {
       name: `${findDriver.firstName} ${findDriver.lastName}`,
       trip: `${findDriver.pickup} - ${findDriver.destination}`,
       size: findDriver.size,
-      available_space: "",
+      available_space: findDriver.space,
       type: dbUser.car_type,
       reg_no: dbUser.reg_no,
       price: findDriver.price,

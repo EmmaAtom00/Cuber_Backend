@@ -48,6 +48,8 @@ const DriverRide = new mongoose.Schema(
       startTime: String,
       endTime: String,
     },
+    available: { type: Boolean, default: true },
+    space: Number,
   },
   { timestamps: true }
 );

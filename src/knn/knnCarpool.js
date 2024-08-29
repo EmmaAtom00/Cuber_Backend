@@ -1,4 +1,4 @@
-function knn(drivers, passengers, preferences = {}) {
+function knn(drivers, passengers, preferences = { available: true }) {
   // Function to calculate Euclidean distance in kilometers
   function calculateDistance(lat1, lon1, lat2, lon2) {
     const earthRadius = 6371; // Radius of the Earth in kilometers
@@ -33,6 +33,11 @@ function knn(drivers, passengers, preferences = {}) {
     if (preferences.gender) {
       eligibleDrivers = eligibleDrivers.filter(
         (driver) => driver.gender === preferences.gender
+      );
+    }
+    if (preferences.available) {
+      eligibleDrivers = eligibleDrivers.filter(
+        (driver) => driver.available === preferences.available
       );
     }
 

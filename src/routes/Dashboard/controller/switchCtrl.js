@@ -11,6 +11,8 @@ const switchMode = async (req, res) => {
     const existingDrive = await driver.findOne({ email: req.user.email });
     const existingRide = await passenger.findOne({ email: req.user.email });
 
+    // console.log(existingDrive, existingRide);
+
     if (!(existingDrive || existingRide)) {
       const change = await user.findOneAndUpdate(
         { email: find.email },

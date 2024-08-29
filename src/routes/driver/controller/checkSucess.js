@@ -5,7 +5,7 @@ const checkSuccess = async (req, res) => {
     const passengerId = req.params.id;
     if (!passengerId) return res.status(404).json({ msg: "No user found" });
 
-    const Status = await passengerHistory.findOne({ email: passengerId });
+    const Status = await passengerHistory.findOne({ _id: passengerId });
     if (!Status) return res.status(200).json({ success: false });
     else {
       return res.status(200).json({ success: true });
